@@ -29,11 +29,11 @@ public class LevelEditorScene extends Scene {
 
         sprites = AssetPool.getSpritesheet("assets/images/spritesheet.png");
 
-        obj1 = new GameObject("Object 1", new Transform(new Vector2f(100, 100), new Vector2f(256, 256)));
+        obj1 = new GameObject("Object 1", new Transform(new Vector2f(300, 100), new Vector2f(256, 256)),4);
         obj1.addComponent(new SpriteRenderer(sprites.getSprite(0)));
         this.addGameObjectToScene(obj1);
 
-        GameObject obj2 = new GameObject("Object 2", new Transform(new Vector2f(400, 100), new Vector2f(256, 256)));
+        GameObject obj2 = new GameObject("Object 2", new Transform(new Vector2f(400, 100), new Vector2f(256, 256)),3);
         obj2.addComponent(new SpriteRenderer(sprites.getSprite(20)));
         this.addGameObjectToScene(obj2);
     }
