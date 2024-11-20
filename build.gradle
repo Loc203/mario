@@ -35,7 +35,7 @@ dependencies {
     testImplementation('junit:junit:4.13')
 
     // GSON
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.9.0'
 
     // Imgui files
     implementation fileTree('libs') { include '*.jar' }
