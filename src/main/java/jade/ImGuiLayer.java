@@ -1,13 +1,12 @@
 package jade;
 
+import imgui.ImFontAtlas;
+import imgui.ImFontConfig;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
-import imgui.flag.ImGuiBackendFlags;
-import imgui.flag.ImGuiConfigFlags;
-import imgui.flag.ImGuiKey;
-import imgui.flag.ImGuiMouseCursor;
+import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 
@@ -36,7 +35,7 @@ public class ImGuiLayer {
         // Initialize ImGuiIO config
         final ImGuiIO io = ImGui.getIO();
         io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
-        io.setIniFilename(null); // We don't want to save .ini file
+        io.setIniFilename("imgui.ini");
         io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard); // Navigation with keyboard
         io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors); // Mouse cursors to display while resizing windows etc.
         io.setBackendPlatformName("imgui_java_impl_glfw");
@@ -147,19 +146,21 @@ public class ImGuiLayer {
         // Fonts configuration
         // Read: https://raw.githubusercontent.com/ocornut/imgui/master/docs/FONTS.txt
 
-//        // Typ som macens typsnittsbok
-//        final ImFontAtlas fontAtlas = io.getFonts();
-//        final ImFontConfig fontConfig = new ImFontConfig(); // Natively allocated object, should be explicitly destroyed
-//
-//        // Glyphs could be added per-font as well as per config used globally like here
-//        fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault());
-//
-//        // previously added font
-//        fontConfig.setPixelSnapH(true);
-//        fontAtlas.addFontFromFileTTF("assets/fonts/segoeui.ttf", 32, fontConfig);
-//
-//        fontConfig.destroy(); // After all fonts were added we don't need this config more
 
+        final ImFontAtlas fontAtlas = io.getFonts();
+        final ImFontConfig fontConfig = new ImFontConfig(); // Natively allocated object, should be explicitly destroyed
+
+        // Glyphs could be added per-font as well as per config used globally like here
+        fontConfig.setGlyphRanges(fontAtlas.getGlyphRangesDefault());
+
+        // previously added font
+        fontConfig.setPixelSnapH(true);
+        fontAtlas.addFontFromFileTTF("C:/Windows/Fonts/Inkfree.ttf", 16, fontConfig);
+
+        fontConfig.destroy(); // After all fonts were added we don't need this config more
+
+        fontAtlas.setFlags(ImGuiFreeTypeBuilderFlags.LightHinting);
+        fontAtlas.build();
         // Method initializes LWJGL3 renderer.
         // This method SHOULD be called after you've initialized your ImGui
         // configuration (fonts and so on).
@@ -168,11 +169,14 @@ public class ImGuiLayer {
         imGuiGl3.init("#version 330 core");
     }
 
-    public void update(float dt) {
+    public void update(float dt, Scene currentScene) {
         startFrame(dt);
 
         // Any Dear ImGui code SHOULD go between ImGui.newFrame()/ImGui.render() methods
+//        ImGui.newFrame();
+        currentScene.sceneImgui();
         ImGui.showDemoWindow();
+//        ImGui.render();
 
         endFrame();
     }
