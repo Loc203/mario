@@ -2,7 +2,6 @@ package renderer;
 
 import components.SpriteRenderer;
 import jade.Window;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import util.AssetPool;
@@ -165,7 +164,7 @@ public class RenderBatch implements Comparable<RenderBatch>{
         int texId = 0;
         if (sprite.getTexture() != null) {
             for (int i = 0; i < textures.size(); i++) {
-                if (textures.get(i) == sprite.getTexture()) {
+                if (textures.get(i).equals(sprite.getTexture())) {
                     texId = i + 1;
                     break;
                 }

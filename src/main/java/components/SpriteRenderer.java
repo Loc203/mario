@@ -1,6 +1,5 @@
 package components;
 
-import jade.Component;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import renderer.Texture;
@@ -26,6 +25,9 @@ public class SpriteRenderer extends Component {
 //        this.color = new Vector4f(1, 1, 1, 1);
 //        this.isDirty = true;
 //    }
+public void setTexture(Texture texture) {
+    this.sprite.setTexture(texture);
+}
 
     @Override
     public void start() {

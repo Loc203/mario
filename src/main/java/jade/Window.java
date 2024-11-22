@@ -2,12 +2,16 @@ package jade;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import renderer.DebugDraw;
+import renderer.Framebuffer;
+import scenes.LevelEditorScene;
+import scenes.LevelScene;
+import scenes.Scene;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
-
 public class Window {
 
     private int width, height;
@@ -20,6 +24,7 @@ public class Window {
     private static Window window = null;
 
     private static Scene currentScene;
+    private Framebuffer framebuffer;
 
     private Window() {
         this.width = 1920;
@@ -91,7 +96,7 @@ public class Window {
 
         glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+//        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -108,10 +113,10 @@ public class Window {
         glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
         glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
         glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
-        // glfwSetWindowSizeCallback(glfwWindow, (w, newWidth, newHeight) -> {
-        // Window.setWidth(newWidth);
-        // Window.setHeight(newHeight);
-        // });
+//         glfwSetWindowSizeCallback(glfwWindow, (w, newWidth, newHeight) -> {
+//         Window.setWidth(newWidth);
+//         Window.setHeight(newHeight);
+//         });
 
         // Make OpenGL the context current
         glfwMakeContextCurrent(glfwWindow);
@@ -128,6 +133,9 @@ public class Window {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         this.imGuiLayer = new ImGuiLayer(glfwWindow);
         this.imGuiLayer.initImGui();
+        // unCMT dong nay de tat buffer
+//        this.framebuffer = new Framebuffer(3840, 2160);
+        //========================
         Window.changeScene(0);
     }
 
@@ -140,13 +148,20 @@ public class Window {
         while (!glfwWindowShouldClose(glfwWindow)) {
             // Poll events
             glfwPollEvents();
+            DebugDraw.beginFrame();
 
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
-
+            // unCMT dong nay de tat buffer
+//            this.framebuffer.bind();
+            //---------------------
             if (dt >= 0) {
+                DebugDraw.draw();
                 currentScene.update(dt);
             }
+            // unCMT dong nay de tat buffer
+//            this.framebuffer.unbind();
+            //---------------------
 //            this.imGuiLayer.update(dt);
             this.imGuiLayer.update(dt, currentScene);
             glfwSwapBuffers(glfwWindow);
