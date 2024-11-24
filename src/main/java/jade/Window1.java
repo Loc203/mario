@@ -21,7 +21,6 @@ public class Window1 {
     private String glslVersion = null;
     private long windowPtr;
     private ImGuiLayer1 imguiLayer1;
-
     public Window1(ImGuiLayer1 layer) {
         imguiLayer1 = layer;
     }

@@ -1,4 +1,4 @@
-package physics2d.rigidbody;
+package physics2dtest.rigidbody;
 
 import components.Component;
 import org.joml.Vector2f;

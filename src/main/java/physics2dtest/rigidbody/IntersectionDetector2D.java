@@ -1,9 +1,9 @@
-package physics2d.rigidbody;
+package physics2dtest.rigidbody;
 
 import org.joml.Vector2f;
-import physics2d.primitives.AABB;
-import physics2d.primitives.Box2D;
-import physics2d.primitives.Circle;
+import physics2dtest.primitives.AABB;
+import physics2dtest.primitives.Box2D;
+import physics2dtest.primitives.Circle;
 import renderer.Line2D;
 import util.JMath;
 

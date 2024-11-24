@@ -1,10 +1,10 @@
 package components;
 
+import editor.JImGui;
+import jade.Transform;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import renderer.Texture;
-import jade.Transform;
-import imgui.ImGui;
 
 public class SpriteRenderer extends Component {
 
@@ -12,8 +12,8 @@ public class SpriteRenderer extends Component {
     private Sprite sprite = new Sprite();
 
     private transient Transform lastTransform;
-//        private transient boolean isDirty = false;
     private transient boolean isDirty = true;
+
 //    public SpriteRenderer(Vector4f color) {
 //        this.color = color;
 //        this.sprite = new Sprite(null);
@@ -25,9 +25,6 @@ public class SpriteRenderer extends Component {
 //        this.color = new Vector4f(1, 1, 1, 1);
 //        this.isDirty = true;
 //    }
-public void setTexture(Texture texture) {
-    this.sprite.setTexture(texture);
-}
 
     @Override
     public void start() {
@@ -44,9 +41,7 @@ public void setTexture(Texture texture) {
 
     @Override
     public void imgui() {
-        float[] imColor = {color.x, color.y, color.z, color.w};
-        if (ImGui.colorPicker4("Color Picker: ", imColor)) {
-            this.color.set(imColor[0], imColor[1], imColor[2], imColor[3]);
+        if (JImGui.colorPicker4("Color Pickier", this.color)) {
             this.isDirty = true;
         }
     }
@@ -81,5 +76,19 @@ public void setTexture(Texture texture) {
 
     public void setClean() {
         this.isDirty = false;
+    }
+
+    public void setTexture(Texture texture) {
+        this.sprite.setTexture(texture);
+    }
+    @Override
+    public void editorUpdate(float dt) {
+        if (!this.lastTransform.equals(this.gameObject.transform)) {
+            this.gameObject.transform.copy(this.lastTransform);
+            isDirty = true;
+        }
+    }
+    public void setDirty() {
+        this.isDirty = true;
     }
 }

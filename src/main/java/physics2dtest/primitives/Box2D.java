@@ -1,7 +1,7 @@
-package physics2d.primitives;
+package physics2dtest.primitives;
 
 import org.joml.Vector2f;
-import physics2d.rigidbody.Rigidbody2D;
+import physics2dtest.rigidbody.Rigidbody2D;
 
 public class Box2D {
     private Vector2f size = new Vector2f();

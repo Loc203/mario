@@ -20,16 +20,24 @@ public class MouseControls extends Component {
     }
 
     @Override
-    public void update(float dt) {
-        if (holdingObject != null) {
+    public void editorUpdate(float dt) {
+        if (this.holdingObject != null)
+        {
             holdingObject.transform.position.x = MouseListener.getOrthoX();
             holdingObject.transform.position.y = MouseListener.getOrthoY();
-            holdingObject.transform.position.x = (int)(holdingObject.transform.position.x / Settings.GRID_WIDTH) * Settings.GRID_WIDTH;
-            holdingObject.transform.position.y = (int)(holdingObject.transform.position.y / Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT;
+            if (holdingObject.transform.position.x >= 0.0f)
+                holdingObject.transform.position.x = (int)(holdingObject.transform.position.x/ Settings.GRID_WIDTH) * Settings.GRID_WIDTH;
+            else
+                holdingObject.transform.position.x = (int)(holdingObject.transform.position.x/ Settings.GRID_WIDTH) * Settings.GRID_WIDTH - Settings.GRID_WIDTH;
+            if (holdingObject.transform.position.y >= 0.0f)
+                holdingObject.transform.position.y = (int)(holdingObject.transform.position.y/ Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT;
+            else
+                holdingObject.transform.position.y = (int)(holdingObject.transform.position.y/ Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT - Settings.GRID_HEIGHT;
 
-            if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+
+            if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT))
                 place();
-            }
         }
+
     }
 }
