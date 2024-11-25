@@ -44,10 +44,10 @@ public class Texture {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0),
                         0, GL_RGBA, GL_UNSIGNED_BYTE, image);
             } else {
-                assert false : "Error: (Texture)'" + channels.get(0) + "'";
+//                assert false : "Error: (Texture)'" + channels.get(0) + "'";
             }
         } else {
-            assert false : "Error: (Texture) Could not load image '" + filepath + "'";
+//            assert false : "Error: (Texture) Could not load image '" + filepath + "'";
         }
 
         stbi_image_free(image);

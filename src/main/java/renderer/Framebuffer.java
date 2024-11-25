@@ -23,7 +23,7 @@ public class Framebuffer {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboID);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            assert false : "Error: Framebuffer is not complete";
+//            assert false : "Error: Framebuffer is not complete";
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }

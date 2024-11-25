@@ -4,7 +4,12 @@ import observers.EventSystem;
 import observers.Observer;
 import observers.events.Event;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.GL;
+import physics2d.Physics2D;
 import renderer.*;
 import scenes.LevelEditorSceneInitializer;
 import scenes.Scene;
@@ -13,6 +18,7 @@ import util.AssetPool;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window implements Observer {
@@ -28,6 +34,8 @@ public class Window implements Observer {
     private static Scene currentScene;
     private Framebuffer framebuffer;
     private PickingTexture pickingTexture;
+    private long audioContext;
+    private long audioDevice;
 
     private Window() {
         this.width = 1920;
@@ -64,7 +72,9 @@ public class Window implements Observer {
     public void run() {
         init();
         loop();
-
+        //audio
+        alcDestroyContext(audioContext);
+        alcCloseDevice(audioDevice);
         glfwFreeCallbacks(glfwWindow);
         glfwDestroyWindow(glfwWindow);
         glfwTerminate();
@@ -112,6 +122,18 @@ public class Window implements Observer {
         //window visible
         glfwShowWindow(glfwWindow);
 
+        // init audio device
+        String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+        audioDevice = alcOpenDevice(defaultDeviceName);
+        int[] attributes = {0};
+        audioContext = alcCreateContext(audioDevice, attributes);
+        alcMakeContextCurrent(audioContext);
+        ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+        if (!alCapabilities.OpenAL10) {
+            assert false : "Audio library not supported.";
+        }
+
         GL.createCapabilities();
 
         glEnable(GL_BLEND);
@@ -158,7 +180,6 @@ public class Window implements Observer {
             glClear(GL_COLOR_BUFFER_BIT);
             //---------------------
             if (dt >= 0) {
-                DebugDraw.draw();
                 Renderer.bindShader(defaultShader);
                 if (runtimePlaying) {
                     currentScene.update(dt);
@@ -166,14 +187,16 @@ public class Window implements Observer {
                     currentScene.editorUpdate(dt);
                 }
                 currentScene.render();
+                DebugDraw.draw();
             }
             // unCMT dong nay de tat buffer
             this.framebuffer.unbind();
             //---------------------
 //            this.imGuiLayer.update(dt);
             this.imGuiLayer.update(dt, currentScene);
-            glfwSwapBuffers(glfwWindow);
+            KeyListener.endFrame();
             MouseListener.endFrame();
+            glfwSwapBuffers(glfwWindow);
             endTime = (float) glfwGetTime();
             dt = endTime - beginTime;
             beginTime = endTime;
@@ -182,10 +205,12 @@ public class Window implements Observer {
 
     public static int getWidth() {
         return Window.get().width;
+//        return 3840;
     }
 
     public static int getHeight() {
         return Window.get().height;
+//        return 2160;
     }
 
     private static void setWidth(int newWidth) {
@@ -220,8 +245,11 @@ public class Window implements Observer {
                 break;
             case LoadLevel:
                 Window.changeScene(new LevelEditorSceneInitializer());
+                break;
             case SaveLevel:
                 currentScene.save();
+                break;
         }
     }
+    public static Physics2D getPhysics() { return currentScene.getPhysics(); }
 }

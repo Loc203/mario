@@ -43,4 +43,5 @@ public class Spritesheet {
     public int size() {
         return this.sprites.size();
     }
+    public List<Sprite> getSprites() { return this.sprites; }
 }

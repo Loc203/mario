@@ -1,7 +1,12 @@
 package jade;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import components.Component;
+import components.ComponentDeserializer;
+import components.SpriteRenderer;
 import imgui.ImGui;
+import util.AssetPool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +15,7 @@ public class GameObject {
     private static int ID_COUNTER = 0;
     private int uid = -1;
 
-    private String name;
+    public String name;
     private List<Component> components;
     private boolean doSerialization = true;
     public transient Transform transform;
@@ -29,7 +34,7 @@ public class GameObject {
                     return componentClass.cast(c);
                 } catch (ClassCastException e) {
                     e.printStackTrace();
-                    assert false : "Error: Casting component.";
+//                    assert false : "Error: Casting component.";
                 }
             }
         }
@@ -107,5 +112,28 @@ public class GameObject {
 
     public boolean isDead() {
         return this.isDead;
+    }
+
+    // copu entity
+    public GameObject copy() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Component.class, new ComponentDeserializer())
+                .registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
+                .create();
+        String objAsJson = gson.toJson(this);
+        GameObject obj = gson.fromJson(objAsJson, GameObject.class);
+        obj.generateUid();
+        for (Component c : obj.getAllComponents()) {
+            c.generateId();
+        }
+        SpriteRenderer sprite = obj.getComponent(SpriteRenderer.class);
+        if (sprite != null && sprite.getTexture() != null) {
+            sprite.setTexture(AssetPool.getTexture(sprite.getTexture().getFilepath()));
+        }
+        return obj;
+    }
+
+    public void generateUid() {
+        this.uid = ID_COUNTER++;
     }
 }

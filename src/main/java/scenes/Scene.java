@@ -39,7 +39,7 @@ public class Scene {
     }
 
     public void init() {
-        this.camera = new Camera(new Vector2f(-250, 0));
+        this.camera = new Camera(new Vector2f(0, 0));
         this.sceneInitializer.loadResources(this);
         this.sceneInitializer.init(this);
     }
@@ -134,6 +134,7 @@ public class Scene {
         return go;
     }
 
+    //ghi map vao file
     public void save() {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
@@ -156,6 +157,7 @@ public class Scene {
         }
     }
 
+    //load map tu file => hien thi
     public void load() {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
@@ -192,5 +194,8 @@ public class Scene {
             GameObject.init(maxGoId);
             Component.init(maxCompId);
         }
+    }
+    public Physics2D getPhysics() {
+        return this.physics2D;
     }
 }
