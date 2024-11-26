@@ -29,12 +29,14 @@ public class Scene {
     private Physics2D physics2D;
 
     private SceneInitializer sceneInitializer;
+    private List<GameObject> pendingObjects;
 
     public Scene(SceneInitializer sceneInitializer) {
         this.sceneInitializer = sceneInitializer;
         this.physics2D = new Physics2D();
         this.renderer = new Renderer();
         this.gameObjects = new ArrayList<>();
+        this.pendingObjects = new ArrayList<>();
         this.isRunning = false;
     }
 
@@ -58,10 +60,7 @@ public class Scene {
         if (!isRunning) {
             gameObjects.add(go);
         } else {
-            gameObjects.add(go);
-            go.start();
-            this.renderer.add(go);
-            this.physics2D.add(go);
+            pendingObjects.add(go);
         }
     }
 
@@ -96,6 +95,13 @@ public class Scene {
                 i--;
             }
         }
+        for (GameObject go : pendingObjects) {
+            gameObjects.add(go);
+            go.start();
+            this.renderer.add(go);
+            this.physics2D.add(go);
+        }
+        pendingObjects.clear();
     }
 
     public void update(float dt) {
@@ -113,6 +119,13 @@ public class Scene {
                 i--;
             }
         }
+        for (GameObject go : pendingObjects) {
+            gameObjects.add(go);
+            go.start();
+            this.renderer.add(go);
+            this.physics2D.add(go);
+        }
+        pendingObjects.clear();
     }
 
     public void render() {
@@ -140,6 +153,7 @@ public class Scene {
                 .setPrettyPrinting()
                 .registerTypeAdapter(Component.class, new ComponentDeserializer())
                 .registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
+                .enableComplexMapKeySerialization()
                 .create();
 
         try {
@@ -163,6 +177,7 @@ public class Scene {
                 .setPrettyPrinting()
                 .registerTypeAdapter(Component.class, new ComponentDeserializer())
                 .registerTypeAdapter(GameObject.class, new GameObjectDeserializer())
+                .enableComplexMapKeySerialization()
                 .create();
 
         String inFile = "";
@@ -195,6 +210,21 @@ public class Scene {
             Component.init(maxCompId);
         }
     }
+    public <T extends Component> GameObject getGameObjectWith(Class<T> clazz) {
+        for (GameObject go : gameObjects) {
+            if (go.getComponent(clazz) != null) {
+                return go;
+            }
+        }
+        return null;
+    }
+    public GameObject getGameObject(String gameObjectName) {
+        Optional<GameObject> result = this.gameObjects.stream()
+                .filter(gameObject -> gameObject.name.equals(gameObjectName))
+                .findFirst();
+        return result.orElse(null);
+    }
+
     public Physics2D getPhysics() {
         return this.physics2D;
     }

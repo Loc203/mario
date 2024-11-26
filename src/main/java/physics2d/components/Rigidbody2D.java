@@ -26,16 +26,25 @@ public class Rigidbody2D extends Component {
     @Override
     public void update(float dt) {
         if (rawBody != null) {
-            this.gameObject.transform.position.set(
-                    rawBody.getPosition().x, rawBody.getPosition().y
-            );
-            this.gameObject.transform.rotation = (float)Math.toDegrees(rawBody.getAngle());
+            if (this.bodyType == BodyType.Dynamic || this.bodyType == BodyType.Kinematic) {
+                this.gameObject.transform.position.set(
+                        rawBody.getPosition().x, rawBody.getPosition().y
+                );
+                this.gameObject.transform.rotation = (float) Math.toDegrees(rawBody.getAngle());
+                Vec2 vel = rawBody.getLinearVelocity();
+                this.velocity.set(vel.x, vel.y);
+            } else if (this.bodyType == BodyType.Static) {
+                this.rawBody.setTransform(
+                        new Vec2(this.gameObject.transform.position.x, this.gameObject.transform.position.y),
+                        this.gameObject.transform.rotation
+                );
+            }
         }
     }
 
     public void addVelocity(Vector2f forceToAdd) {
         if (rawBody != null) {
-            rawBody.applyForceToCenter(new Vec2(velocity.x, velocity.y));
+            rawBody.applyForceToCenter(new Vec2(forceToAdd.x, forceToAdd.y));
         }
     }
 
@@ -44,7 +53,11 @@ public class Rigidbody2D extends Component {
             rawBody.applyLinearImpulse(new Vec2(velocity.x, velocity.y), rawBody.getWorldCenter());
         }
     }
-
+    public void setPosition(Vector2f newPos) {
+        if (rawBody != null) {
+            rawBody.setTransform(new Vec2(newPos.x, newPos.y), gameObject.transform.rotation);
+        }
+    }
     public Vector2f getVelocity() {
         return velocity;
     }
