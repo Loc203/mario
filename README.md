@@ -40,7 +40,7 @@ Dich chuyen 1/10 block `Shift`:
 + `↑` dich chuyen vat the len tren
 + `↓` dich chuyen vat the xuong duoi
 
-Dich chuyen 1 block `Shift`:
+Dich chuyen 1 block:
 + `←` dich chuyen vat the sang trai
 + `→` dich chuyen vat the sang phai
 + `↑` dich chuyen vat the len tren
