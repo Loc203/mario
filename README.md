@@ -8,6 +8,12 @@
 
 ## Mod
 
+Vao `Windown.java` thay doi 
+
+`public static final boolean RELEASE_BUILD = true` => che do nguoi choi
+
+`public static final boolean RELEASE_BUILD = false` => che do tuy chinh
+
 `E` Di chuyen vat the
 
 `R` Thu/Phong vat the
@@ -15,6 +21,8 @@
 `Ctrl + D` Nhan doi(x2) vat the
 
 `Delete` Xoa vat the
+
+`Space` Dich chuyen man hinh ve giua
 
 Nhan + giu nut chuc nang ben hong chuot de di chuyen man hinh. Co the tuy chinh trong `EditorCamera.java`
 
@@ -41,3 +49,6 @@ Dich chuyen 1 block `Shift`:
 `Page Up` +1 zIndex cua chu the 
 
 `Page Down` -1 zIndex cua chu the 
+
+Run configurations
+![Run-configurations.png](Run-configurations.png)

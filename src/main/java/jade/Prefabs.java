@@ -171,8 +171,8 @@ public class Prefabs {
         //===========================================================
         //add hit box character
         PillboxCollider pb = new PillboxCollider();
-        pb.width = 0.39f;
-        pb.height = 0.31f;
+        pb.width = 0.21f;
+        pb.height = 0.25f;
         Rigidbody2D rb = new Rigidbody2D();
         rb.setBodyType(BodyType.Dynamic);
         rb.setContinuousCollision(false);
@@ -181,6 +181,7 @@ public class Prefabs {
         mario.addComponent(rb);
         mario.addComponent(pb);
         mario.addComponent(new PlayerController());
+        mario.transform.zIndex = 10;
         //=========================
         return mario;
     }
@@ -299,6 +300,7 @@ public class Prefabs {
         goomba.addComponent(new GoombaAI());
         return goomba;
     }
+    // tao ong dich chuyen
     public static GameObject generatePipe(Direction direction) {
         Spritesheet pipes = AssetPool.getSpritesheet("assets/images/pipes.png");
         int index = direction == Direction.Down ? 0 :
@@ -318,5 +320,109 @@ public class Prefabs {
         pipe.addComponent(new Pipe(direction));
         pipe.addComponent(new Ground());
         return pipe;
+    }
+    // gen turtle
+    public static GameObject generateTurtle() {
+        Spritesheet turtleSprites = AssetPool.getSpritesheet("assets/images/turtle.png");
+        GameObject turtle = generateSpriteObject(turtleSprites.getSprite(0), 0.25f, 0.35f);
+        AnimationState walk = new AnimationState();
+        walk.title = "Walk";
+        float defaultFrameTime = 0.23f;
+        walk.addFrame(turtleSprites.getSprite(0), defaultFrameTime);
+        walk.addFrame(turtleSprites.getSprite(1), defaultFrameTime);
+        walk.setLoop(true);
+        AnimationState squashed = new AnimationState();
+        squashed.title = "TurtleShellSpin";
+        squashed.addFrame(turtleSprites.getSprite(2), 0.1f);
+        squashed.setLoop(false);
+        StateMachine stateMachine = new StateMachine();
+        stateMachine.addState(walk);
+        stateMachine.addState(squashed);
+        stateMachine.setDefaultState(walk.title);
+        stateMachine.addState(walk.title, squashed.title, "squashMe");
+        turtle.addComponent(stateMachine);
+        Rigidbody2D rb = new Rigidbody2D();
+        rb.setBodyType(BodyType.Dynamic);
+        rb.setMass(0.1f);
+        rb.setFixedRotation(true);
+        turtle.addComponent(rb);
+        CircleCollider circle = new CircleCollider();
+        circle.setRadius(0.13f);
+        circle.setOffset(new Vector2f(0, -0.05f));
+        turtle.addComponent(circle);
+        turtle.addComponent(new TurtleAI());
+        return turtle;
+    }
+    //Gen flag=======================
+    public static GameObject generateFlagtop() {
+        Spritesheet items = AssetPool.getSpritesheet("assets/images/items.png");
+        GameObject flagtop = generateSpriteObject(items.getSprite(6), 0.25f, 0.25f);
+        Rigidbody2D rb = new Rigidbody2D();
+        rb.setBodyType(BodyType.Dynamic);
+        rb.setFixedRotation(true);
+        rb.setContinuousCollision(false);
+        flagtop.addComponent(rb);
+        Box2DCollider boxCollider = new Box2DCollider();
+        boxCollider.setHalfSize(new Vector2f(0.1f, 0.25f));
+        boxCollider.setOffset(new Vector2f(-0.075f, 0.0f));
+        flagtop.addComponent(boxCollider);
+        flagtop.addComponent(new Flagpole(true));
+        return flagtop;
+    }
+    public static GameObject generateFlagPole() {
+        Spritesheet items = AssetPool.getSpritesheet("assets/images/items.png");
+        GameObject flagtop = generateSpriteObject(items.getSprite(33), 0.25f, 0.25f);
+        Rigidbody2D rb = new Rigidbody2D();
+        rb.setBodyType(BodyType.Dynamic);
+        rb.setFixedRotation(true);
+        rb.setContinuousCollision(false);
+        flagtop.addComponent(rb);
+        Box2DCollider boxCollider = new Box2DCollider();
+        boxCollider.setHalfSize(new Vector2f(0.1f, 0.25f));
+        boxCollider.setOffset(new Vector2f(-0.075f, 0.0f));
+        flagtop.addComponent(boxCollider);
+        flagtop.addComponent(new Flagpole(false));
+        return flagtop;
+    }
+//=====================================
+    //fire balllllllllllllllllllllllll 🔥
+public static GameObject generateFireball(Vector2f position) {
+    Spritesheet items = AssetPool.getSpritesheet("assets/images/items.png");
+    GameObject fireball = generateSpriteObject(items.getSprite(32), 0.18f, 0.18f);
+    fireball.transform.position = position;
+    Rigidbody2D rb = new Rigidbody2D();
+    rb.setBodyType(BodyType.Dynamic);
+    rb.setFixedRotation(true);
+    rb.setContinuousCollision(false);
+    fireball.addComponent(rb);
+    CircleCollider circleCollider = new CircleCollider();
+    circleCollider.setRadius(0.08f);
+    fireball.addComponent(circleCollider);
+    fireball.addComponent(new Fireball());
+    return fireball;
+}
+    //Coin 🪙
+    public static GameObject generateCoin() {
+        Spritesheet items = AssetPool.getSpritesheet("assets/images/items.png");
+        GameObject coin = generateSpriteObject(items.getSprite(7), 0.25f, 0.25f);
+        AnimationState coinFlip = new AnimationState();
+        coinFlip.title = "CoinFlip";
+        float defaultFrameTime = 0.23f;
+        coinFlip.addFrame(items.getSprite(7), 0.57f);
+        coinFlip.addFrame(items.getSprite(8), defaultFrameTime);
+        coinFlip.addFrame(items.getSprite(9), defaultFrameTime);
+        coinFlip.setLoop(true);
+        StateMachine stateMachine = new StateMachine();
+        stateMachine.addState(coinFlip);
+        stateMachine.setDefaultState(coinFlip.title);
+        coin.addComponent(stateMachine);
+        coin.addComponent(new Coin());
+        CircleCollider circleCollider = new CircleCollider();
+        circleCollider.setRadius(0.12f);
+        coin.addComponent(circleCollider);
+        Rigidbody2D rb = new Rigidbody2D();
+        rb.setBodyType(BodyType.Static);
+        coin.addComponent(rb);
+        return coin;
     }
 }

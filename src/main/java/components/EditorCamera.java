@@ -45,12 +45,12 @@ public class EditorCamera extends Component {
             dragDebounce = 0.1f;
         }
 
-//        if (MouseListener.getScrollY() != 0.0f) {
-//            float addValue = (float)Math.pow(Math.abs(MouseListener.getScrollY() * scrollSensitivity),
-//                    1 / levelEditorCamera.getZoom());
-//            addValue *= -Math.signum(MouseListener.getScrollY());
-//            levelEditorCamera.addZoom(addValue);
-//        }
+        if (MouseListener.getScrollY() != 0.0f) {
+            float addValue = (float)Math.pow(Math.abs(MouseListener.getScrollY() * scrollSensitivity),
+                    1 / levelEditorCamera.getZoom());
+            addValue *= -Math.signum(MouseListener.getScrollY());
+            levelEditorCamera.addZoom(addValue);
+        }
 
         if (KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
             reset = true;

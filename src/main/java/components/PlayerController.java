@@ -2,6 +2,7 @@ package components;
 
 import jade.GameObject;
 import jade.KeyListener;
+import jade.Prefabs;
 import jade.Window;
 import org.jbox2d.dynamics.contacts.Contact;
 import org.joml.Vector2f;
@@ -11,8 +12,9 @@ import physics2d.components.PillboxCollider;
 import physics2d.components.Rigidbody2D;
 import physics2d.enums.BodyType;
 import scenes.LevelEditorSceneInitializer;
-import util.AssetPool;
 import scenes.LevelSceneInitializer;
+import util.AssetPool;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class PlayerController extends Component {
@@ -50,7 +52,9 @@ public class PlayerController extends Component {
     private transient boolean deadGoingUp = true;
     private transient float blinkTime = 0.0f;
     private transient SpriteRenderer spr;
-
+    private transient boolean playWinAnimation = false;
+    private transient float timeToCastle = 4.5f;
+    private transient float walkTime = 2.2f;
     @Override
     public void start() {
         this.spr = gameObject.getComponent(SpriteRenderer.class);
@@ -61,6 +65,37 @@ public class PlayerController extends Component {
 
     @Override
     public void update(float dt) {
+        if (playWinAnimation) {
+            checkOnGround();
+            if (!onGround) {
+                gameObject.transform.scale.x = -0.25f;
+                gameObject.transform.position.y -= dt;
+                stateMachine.trigger("stopRunning");
+                stateMachine.trigger("stopJumping");
+            } else {
+                if (this.walkTime > 0) {
+                    gameObject.transform.scale.x = 0.25f;
+                    gameObject.transform.position.x += dt;
+                    stateMachine.trigger("startRunning");
+                }
+                if (!AssetPool.getSound("assets/sounds/stage_clear.ogg").isPlaying()) {
+                    AssetPool.getSound("assets/sounds/stage_clear.ogg").play();
+                }
+                timeToCastle -= dt;
+                walkTime -= dt;
+                if (timeToCastle <= 0) {
+                    if (Window.RELEASE_BUILD) {
+                        // NOTE: Just infinitely loop. If you wanted additional levels
+                        //       you could set up some state to figure out which level
+                        //       is next and then load that in the LevelSceneInitializer
+                        Window.changeScene(new LevelSceneInitializer());
+                    } else {
+                        Window.changeScene(new LevelEditorSceneInitializer());
+                    }
+                }
+            }
+            return;
+        }
         // het mau => chet
         if (isDead) {
             if (this.gameObject.transform.position.y < deadMaxHeight && deadGoingUp) {
@@ -131,7 +166,18 @@ public class PlayerController extends Component {
                 this.stateMachine.trigger("stopRunning");
             }
         }
-
+        //ban lua :>
+        if (KeyListener.keyBeginPress(GLFW_KEY_E) && playerState == PlayerState.Fire &&
+                Fireball.canSpawn()) {
+            Vector2f position = new Vector2f(this.gameObject.transform.position)
+                    .add(this.gameObject.transform.scale.x > 0
+                            ? new Vector2f(0.26f, 0)
+                            : new Vector2f(-0.26f, 0));
+            GameObject fireball = Prefabs.generateFireball(position);
+            fireball.getComponent(Fireball.class).goingRight =
+                    this.gameObject.transform.scale.x > 0;
+            Window.getScene().addGameObjectToScene(fireball);
+        }
         checkOnGround();
         if ((KeyListener.isKeyPressed(GLFW_KEY_SPACE) || KeyListener.isKeyPressed(GLFW_KEY_UP) || KeyListener.isKeyPressed(GLFW_KEY_W) ) && (jumpTime > 0 || onGround || groundDebounce > 0)) {
             if ((onGround || groundDebounce > 0) && jumpTime == 0) {
@@ -190,7 +236,7 @@ public class PlayerController extends Component {
             if (pb != null) {
                 jumpBoost *= bigJumpBoostFactor;
                 walkSpeed *= bigJumpBoostFactor;
-                pb.setHeight(0.63f);
+                pb.setHeight(0.42f);
             }
         } else if (playerState == PlayerState.Big) {
             playerState = PlayerState.Fire;
@@ -224,11 +270,12 @@ public class PlayerController extends Component {
     }
 
     public boolean isHurtInvincible() {
-        return this.hurtInvincibilityTimeLeft > 0;
+        return this.hurtInvincibilityTimeLeft > 0 || playWinAnimation;
     }
 
     public boolean isInvincible() {
-        return this.playerState == PlayerState.Invincible || this.hurtInvincibilityTimeLeft > 0;
+        return this.playerState == PlayerState.Invincible ||
+                this.hurtInvincibilityTimeLeft > 0 || playWinAnimation;
     }
 
     public void die() {
@@ -271,5 +318,17 @@ public class PlayerController extends Component {
     }
     public boolean isSmall() {
         return this.playerState == PlayerState.Small;
+    }
+    public void playWinAnimation(GameObject flagpole) {
+        if (!playWinAnimation) {
+            playWinAnimation = true;
+            velocity.set(0.0f, 0.0f);
+            acceleration.set(0.0f, 0.0f);
+            rb.setVelocity(velocity);
+            rb.setIsSensor();
+            rb.setBodyType(BodyType.Static);
+            gameObject.transform.position.x = flagpole.transform.position.x;
+            AssetPool.getSound("assets/sounds/flagpole.ogg").play();
+        }
     }
 }

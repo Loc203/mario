@@ -34,28 +34,32 @@ public class Pipe extends Component {
                 case Up:
                     if ((KeyListener.isKeyPressed(GLFW_KEY_DOWN)
                             || KeyListener.isKeyPressed(GLFW_KEY_S))
-                            && isEntrance) {
+                            && isEntrance
+                            && playerAtEntrance()) {
                         playerEntering = true;
                     }
                     break;
                 case Left:
                     if ((KeyListener.isKeyPressed(GLFW_KEY_RIGHT)
                             || KeyListener.isKeyPressed(GLFW_KEY_D))
-                            && isEntrance) {
+                            && isEntrance
+                            && playerAtEntrance()) {
                         playerEntering = true;
                     }
                     break;
                 case Right:
                     if ((KeyListener.isKeyPressed(GLFW_KEY_LEFT)
                             || KeyListener.isKeyPressed(GLFW_KEY_A))
-                            && isEntrance) {
+                            && isEntrance
+                            && playerAtEntrance()) {
                         playerEntering = true;
                     }
                     break;
                 case Down:
                     if ((KeyListener.isKeyPressed(GLFW_KEY_UP)
                             || KeyListener.isKeyPressed(GLFW_KEY_W))
-                            && isEntrance) {
+                            && isEntrance
+                            && playerAtEntrance()) {
                         playerEntering = true;
                     }
                     break;
@@ -117,5 +121,38 @@ public class Pipe extends Component {
                 return new Vector2f(pipe.transform.position).add(0.0f, -0.5f);
         }
         return new Vector2f();
+    }
+
+    public boolean playerAtEntrance() {
+        if (collidingPlayer == null) {
+            return false;
+        }
+        Vector2f min = new Vector2f(gameObject.transform.position).
+                sub(new Vector2f(gameObject.transform.scale).mul(0.5f));
+        Vector2f max = new Vector2f(gameObject.transform.position).
+                add(new Vector2f(gameObject.transform.scale).mul(0.5f));
+        Vector2f playerMax = new Vector2f(collidingPlayer.gameObject.transform.position).
+                add(new Vector2f(collidingPlayer.gameObject.transform.scale).mul(0.5f));
+        Vector2f playerMin = new Vector2f(collidingPlayer.gameObject.transform.position).
+                sub(new Vector2f(collidingPlayer.gameObject.transform.scale).mul(0.5f));
+        switch (direction) {
+            case Up:
+                return playerMin.y >= max.y &&
+                        playerMax.x > min.x &&
+                        playerMin.x < max.x;
+            case Down:
+                return playerMax.y <= min.y &&
+                        playerMax.x > min.x &&
+                        playerMin.x < max.x;
+            case Right:
+                return playerMin.x >= max.x &&
+                        playerMax.y > min.y &&
+                        playerMin.y < max.y;
+            case Left:
+                return playerMin.x <= min.x &&
+                        playerMax.y > min.y &&
+                        playerMin.y < max.y;
+        }
+        return false;
     }
 }

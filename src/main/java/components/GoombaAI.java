@@ -56,6 +56,9 @@ public class GoombaAI extends Component {
         this.velocity.y += this.acceleration.y * dt;
         this.velocity.y = Math.max(Math.min(this.velocity.y, this.terminalVelocity.y), -terminalVelocity.y);
         this.rb.setVelocity(velocity);
+        if (this.gameObject.transform.position.x < Window.getScene().camera().position.x - 0.5f) {
+            this.gameObject.destroy();
+        }
     }
     public void checkOnGround() {
         float innerPlayerWidth = 0.25f * 0.7f;
@@ -63,7 +66,7 @@ public class GoombaAI extends Component {
         onGround = Physics2D.checkOnGround(this.gameObject, innerPlayerWidth, yVal);
     }
     @Override
-    public void beginCollision(GameObject obj, Contact contact, Vector2f contactNormal) {
+    public void preSolve(GameObject obj, Contact contact, Vector2f contactNormal) {
         if (isDead) {
             return;
         }
@@ -75,9 +78,18 @@ public class GoombaAI extends Component {
                 stomp();
             } else if (!playerController.isDead() && !playerController.isInvincible()) {
                 playerController.die();
+                if (!playerController.isDead()) {
+                    contact.setEnabled(false);
+                }
+            } else if (!playerController.isDead() && playerController.isInvincible()) {
+                contact.setEnabled(false);
             }
         } else if (Math.abs(contactNormal.y) < 0.1f) {
             goingRight = contactNormal.x < 0;
+        }
+        if (obj.getComponent(Fireball.class) != null) {
+            stomp();
+            obj.getComponent(Fireball.class).disappear();
         }
     }
     public void stomp() {

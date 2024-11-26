@@ -21,7 +21,7 @@ import util.AssetPool;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.openal.ALC10.*;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window implements Observer {
 
@@ -38,6 +38,9 @@ public class Window implements Observer {
     private PickingTexture pickingTexture;
     private long audioContext;
     private long audioDevice;
+    // chinh thanh false de chinh sua tro choi
+    public static final boolean RELEASE_BUILD = true;
+//    public static final boolean RELEASE_BUILD = false;
 
     private Window() {
         this.width = 1920;
@@ -53,7 +56,9 @@ public class Window implements Observer {
             currentScene.destroy();
 
         }
-        getImguiLayer().getPropertiesWindow().setActiveGameObject(null);
+        if (!RELEASE_BUILD) {
+            getImguiLayer().getPropertiesWindow().setActiveGameObject(null);
+        }
         currentScene = new Scene(sceneInitializer);
         currentScene.load();
         currentScene.init();
@@ -145,9 +150,14 @@ public class Window implements Observer {
         this.pickingTexture = new PickingTexture(3840, 2160);
         glViewport(0, 0, 3840, 2160);
         //========================
-        this.imGuiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
-        this.imGuiLayer.initImGui();
-        Window.changeScene(new LevelEditorSceneInitializer());
+        if (RELEASE_BUILD) {
+            runtimePlaying = true;
+            Window.changeScene(new LevelSceneInitializer());
+        } else {
+            this.imGuiLayer = new ImGuiLayer(glfwWindow, pickingTexture);
+            this.imGuiLayer.initImGui();
+            Window.changeScene(new LevelEditorSceneInitializer());
+        }
     }
 
     public void loop() {
@@ -196,7 +206,14 @@ public class Window implements Observer {
             this.framebuffer.unbind();
             //---------------------
 //            this.imGuiLayer.update(dt);
-            this.imGuiLayer.update(dt, currentScene);
+            if (RELEASE_BUILD) {
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer.getFboID());
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+                glBlitFramebuffer(0, 0, framebuffer.width, framebuffer.height, 0, 0, this.width, this.height,
+                        GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            } else {
+                this.imGuiLayer.update(dt, currentScene);
+            }
             KeyListener.endFrame();
             MouseListener.endFrame();
             glfwSwapBuffers(glfwWindow);
